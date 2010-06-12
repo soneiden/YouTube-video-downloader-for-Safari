@@ -1,15 +1,15 @@
 [Download here][1]
 
-To enable Safari extensions:
+To enable Safari extensions (if you have already enabled the Develop menu, skip steps 1-3):
 
 1. Open Safari Preferences
 2. Click on the Advanced tab
-3. Check "Show Develop menu in menu bar
+3. Check "Show Develop menu in menu bar"
 4. From the Develop menu, check "Enable Extensions"
 
 To install:
 
-1. [Download][1] the .safariextz.
+1. [Download][1] the .safariextz
 2. Double click on it, and choose "Install"
 
 To use:
@@ -18,4 +18,4 @@ To use:
 2. Click the new "Download Video" button
 3. Option-click on any of the available formats
 
-[1]: http://github.com/downloads/jonathanboom/YouTube-video-downloader-for-Safari/YouTube-video-downloader-1.0.1.safariextz
+[1]: http://github.com/downloads/jonathanboom/YouTube-video-downloader-for-Safari/YouTube-video-downloader-1.0.2.safariextz

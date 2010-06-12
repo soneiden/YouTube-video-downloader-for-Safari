@@ -17,7 +17,7 @@ var downloadString = "Downloads: ";
 for (var i = 0; i < fmtMap.length; i++) {
 	var fmt = fmtMap[i].split("/")[0];
 	if (fmt != "5") {
-		downloadString += '<a href="' + baseVideoURL + fmt + '" title="Download as ' + listOfFormats[fmt] + ' by Option-clicking">' + listOfFormats[fmt] + "</a>, ";
+		downloadString += '<a href="' + baseVideoURL + fmt + '" title="Download as ' + listOfFormats[fmt] + ' by Option-clicking" name="video-download-link">' + listOfFormats[fmt] + "</a>, ";
 	}
 }
 downloadString = downloadString.substring(0, downloadString.length-2);
@@ -40,6 +40,11 @@ var downloadDiv = document.createElement("div");
 downloadDiv.id = "downloadDiv";
 downloadDiv.style.display = "none";
 downloadDiv.style.paddingBottom = "4px";
+if (htmlSource.search("vevo") != -1) {
+	downloadDiv.style.backgroundColor = "#FFFFFF";
+	downloadDiv.style.marginBottom = "8px";
+	downloadDiv.style.padding = "4px";
+}
 downloadDiv.innerHTML = '<p><strong>' + downloadString + '</strong></p>'
 	+ "<p>Option-click on a link to download the video in that format.</p>";
 document.getElementById("watch-headline").insertBefore(downloadDiv, document.getElementById("watch-headline-user-info"));
