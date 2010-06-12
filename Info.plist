@@ -11,9 +11,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.2</string>
+	<string>1.0.3</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.2</string>
+	<string>1.0.3</string>
 	<key>Chrome</key>
 	<dict/>
 	<key>Content</key>
@@ -45,7 +45,7 @@
 		</dict>
 	</dict>
 	<key>Update Manifest URL</key>
-	<string>http://github.com/jonathanboom/YouTube-video-downloader-for-Safari/blob/master/UpdateManifest.plist</string>
+	<string>http://github.com/jonathanboom/YouTube-video-downloader-for-Safari/raw/master/UpdateManifest.plist</string>
 	<key>Website</key>
 	<string>http://jonathanboom.tumblr.com</string>
 </dict>
