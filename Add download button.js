@@ -1,13 +1,13 @@
 var videoID = document.URL.substring(document.URL.search("v=")+2, document.URL.search("v=")+13);
 var htmlSource = document.getElementsByTagName("html")[0].innerHTML;
 var tLocation = htmlSource.search('"t":')+6;
-var tValue = htmlSource.substring(tLocation, tLocation + 44);
+var tValue = htmlSource.substring(tLocation, tLocation+44);
 var baseVideoURL = "http://www.youtube.com/get_video?video_id=" + videoID + "&t=" + tValue + "&fmt=";
 
 var listOfFormats = new Array();
+listOfFormats["18"] = "Standard MP4";
 listOfFormats["34"] = "Standard FLV";
 listOfFormats["35"] = "Large FLV (480p)";
-listOfFormats["18"] = "Standard MP4";
 listOfFormats["22"] = "HD MP4 (720p)";
 listOfFormats["37"] = "Full HD MP4 (1080p)";
 
