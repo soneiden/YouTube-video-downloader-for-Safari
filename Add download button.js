@@ -1,69 +1,65 @@
+Array.prototype.indexOf = function (variable) {
+	for (i = 0; i < this.length; i++) {
+		if (this[i] == variable) return i;
+	}
+	return -1;
+}
+Array.prototype.contains = function (variable) {
+	if (this.indexOf(variable) == -1) {
+		return false;
+	} else {
+		return true;
+	}
+}
+function formatMapSorter (a, b) {
+	return formatDescriptions[a][0] - formatDescriptions[b][0];
+}
+// get the HTML source of the video page for later use
 var htmlSource = document.getElementsByTagName("html")[0].innerHTML;
-if (document.URL.search("/user/") == -1) {
+// determine if the page is a channel/user page
+var isChannel = false;
+if (document.URL.search("/user/") != -1) isChannel = true;
+// determine if page is using HTML 5 beta
+var htmlFive = false;
+if (htmlSource.search("html5-player") != -1) htmlFive = true;
+// set array of format descriptions
+var formatDescriptions = new Array();
+formatDescriptions["5"] = [6, "Low quality FLV"];
+formatDescriptions["18"] = [5, "Standard MP4"];
+formatDescriptions["34"] = [4, "Standard FLV"];
+formatDescriptions["35"] = [3, "Large FLV (480p)"];
+formatDescriptions["22"] = [2, "HD MP4 (720p)"];
+formatDescriptions["37"] = [1, "Full HD MP4 (1080p)"];
+
+// Assemble the base URL
+if (!isChannel) {
+	// get video ID
 	var videoID = document.URL.substring(document.URL.search("v=")+2, document.URL.search("v=")+13);
-	var tLocation = htmlSource.search('"t":')+6;
-	var tValue = htmlSource.substring(tLocation, tLocation+44);
-} else {
-	var videoIDLoc = htmlSource.search('"video_id":');
-	var videoID = htmlSource.substring(videoIDLoc).split('"')[3];
-	var tLocation = htmlSource.search('"token":')+10;
-	var tValue = htmlSource.substring(tLocation, tLocation+43) + "=";
-}
-
-var baseVideoURL = "http://www.youtube.com/get_video?video_id=" + videoID + "&t=" + tValue + "&fmt=";
-
-var listOfFormats = new Array();
-listOfFormats["18"] = "Standard MP4";
-listOfFormats["34"] = "Standard FLV";
-listOfFormats["35"] = "Large FLV (480p)";
-listOfFormats["22"] = "HD MP4 (720p)";
-listOfFormats["37"] = "Full HD MP4 (1080p)";
-
-var fmtMapLocation = htmlSource.search('fmt_map":');
-if (document.URL.search("/user/") == -1) {
-	var fmtMap = htmlSource.substring(fmtMapLocation+11).split('", ', 1)[0].split(",");
-} else {
-	var fmtMap = htmlSource.substring(fmtMapLocation+11).split('", ', 1)[0].split("%2C");
-}
-var downloadString = "Downloads: ";
-for (var i = 0; i < fmtMap.length; i++) {
-	if (document.URL.search("/user/") != -1) {
-		fmtMap[i] = fmtMap[i].replace("%2F", "/");
+	if (!htmlFive) {
+		// get token
+		var tokenIndex = htmlSource.search('"t":')+6;
+		var token = htmlSource.substring(tokenIndex, tokenIndex+44);
+	} else {
+		// isolate the HTML5 player script and get its source
+		var scripts = document.getElementsByTagName("script");
+		var scriptSource = scripts[scripts.length - 4].innerHTML;
+		// find where format function is, split into parts
+		var formatLocation = scriptSource.search('setAvailableFormat')+20;
+		var formats = scriptSource.substring(formatLocation).split('", "', 4);
+		formats[3] = formats[3].substring(0, 2);
+		// get video cache URL
+		var videoURL = formats[0];
+		// use format number to get description
+		var formatDescription = formatDescriptions[formats[3]][1];
+		// put into download string
+		var downloadString = '<a href="' + videoURL + '">' + formatDescription + '</a>';
 	}
-	var fmt = fmtMap[i].split("/")[0];
-	if (fmt != "5") {
-		downloadString += '<a href="' + baseVideoURL + fmt + '" title="Download as ' + listOfFormats[fmt] + ' by Option-clicking" name="video-download-link">' + listOfFormats[fmt] + "</a>, ";
-	}
-}
-downloadString = downloadString.substring(0, downloadString.length-2);
-
-var downloadDiv = document.createElement("div");
-downloadDiv.id = "downloadDiv";
-downloadDiv.style.marginBottom = "4px";
-if (htmlSource.search("vevo") != -1) {
-	downloadDiv.style.backgroundColor = "#FFFFFF";
-	downloadDiv.style.marginBottom = "8px";
-	downloadDiv.style.padding = "4px";
-}
-if (document.URL.search("/user/") != -1) {
-	downloadDiv.style.marginTop = "8px";
-}
-downloadDiv.innerHTML = '<p><strong>' + downloadString + '</strong> </p>'
-	+ "<p>Option-click on a link to download the video in that format.</p>";
-if (document.URL.search("/user/") == -1) {
-	downloadDiv.style.display = "none";
-	document.getElementById("watch-headline").insertBefore(downloadDiv, document.getElementById("watch-headline-user-info"));
-} else {
-	downloadDiv.style.display = "block";
-	document.getElementById("user_playlist_navigator").insertBefore(downloadDiv, document.getElementById("playnav-body"));
-}
-
-if (document.URL.search("/user/") == -1) {
+	// defines the displayDownloadLinks() function
 	var downloadFunction = document.createElement("script");
 	downloadFunction.type = "application/x-javascript";
 	downloadFunction.textContent = "function displayDownloadLinks () { "
-		+ "var visibility = document.getElementById('downloadDiv').style.display;"
-		+ "if (visibility == 'none') { "
+		+ "var divVisibility = document.getElementById('downloadDiv').style.display;"
+		+ "if (divVisibility == 'none') { "
 			+ "document.getElementById('downloadDiv').style.display = 'block'; "
 			+ "document.getElementById('downloadVideoButton').innerHTML = '<span class=\"yt-uix-button-content\">Hide Download Links</span>'; "
 		+ "} else { "
@@ -72,7 +68,7 @@ if (document.URL.search("/user/") == -1) {
 		+ "} "
 	+ "}";
 	document.getElementsByTagName("head")[0].appendChild(downloadFunction);
-	
+	// create the Download button
 	var downloadButton = document.createElement("button");
 	downloadButton.type = "button";
 	downloadButton.setAttribute("class", "yt-uix-button");
@@ -80,4 +76,62 @@ if (document.URL.search("/user/") == -1) {
 	downloadButton.id = "downloadVideoButton";
 	downloadButton.innerHTML = '<span class="yt-uix-button-content">Download Video</span>';
 	document.getElementById("watch-headline-user-info").appendChild(downloadButton);
+} else {
+	// on channel pages, get videoID and token of primary video
+	var videoIDIndex = htmlSource.search('"video_id":');
+	var videoID = htmlSource.substring(videoIDIndex).split('"', 4)[3];
+	var tokenIndex = htmlSource.search('"token":')+10;
+	var token = htmlSource.substring(tokenIndex, tokenIndex+43) + "=";
+}
+if (!htmlFive) {
+	var baseVideoURL = "http://www.youtube.com/get_video?video_id=" + videoID + "&t=" + token + "&fmt=";
+	// get the supported formats of video, split it into an array
+	var formatMapIndex = htmlSource.search('"fmt_map":')+12;
+	if (!isChannel) {
+		var formatMap = htmlSource.substring(formatMapIndex).split('", ', 1)[0].split(",");
+	} else {
+		var formatMap = htmlSource.substring(formatMapIndex).split('", ', 1)[0].split("%2C");
+	}
+	// clean up the formatMap array
+	for (var i = 0; i < formatMap.length; i++) {
+		if (isChannel) formatMap[i] = formatMap[i].replace("%2F", "/");
+		formatMap[i] = formatMap[i].split("/", 1)[0];
+	}
+	// assume that if Standard FLV is supported, so is Standard MP4
+	if (formatMap.contains("34") && !formatMap.contains("18")) formatMap.push("18");
+	formatMap.sort(formatMapSorter);
+	// low quality FLV could also be removed here:
+	// formatMap.splice(formatMap.indexOf("5"), 1);
+	// create a string of links to the downloads
+	var downloadString = "Downloads: ";
+	for (var i = 0; i < formatMap.length; i++) {
+		if (formatMap[i] in formatDescriptions) {
+			fmtDescription = formatDescriptions[formatMap[i]][1];
+		} else {
+			// for slight forward compatibility, cleans up an undefined format
+			fmtDescription = "Unknown format";
+		}
+		downloadString += '<a href="' + baseVideoURL + formatMap[i] + '" title="Download as ' + fmtDescription + ' by Option-clicking">' + fmtDescription + "</a>, ";
+	}
+	downloadString = downloadString.substring(0, downloadString.length-2);
+}
+// adds the links and some instructions to a DIV, adds the DIV to the YouTube page
+var downloadDiv = document.createElement("div");
+downloadDiv.id = "downloadDiv";
+downloadDiv.innerHTML = '<p><strong>' + downloadString + '</strong> </p>'
+	+ "<p>Option-click on a link to download the video in that format.</p>";
+downloadDiv.style.marginBottom = "4px";
+// if it's Vevo, give it a white background so it's more visible
+if (htmlSource.search("vevo") != -1) {
+	downloadDiv.style.backgroundColor = "#FFFFFF";
+	downloadDiv.style.marginBottom = "8px";
+	downloadDiv.style.padding = "4px";
+}
+if (!isChannel) {
+	downloadDiv.style.display = "none";
+	document.getElementById("watch-headline").insertBefore(downloadDiv, document.getElementById("watch-headline-user-info"));
+} else {
+	downloadDiv.style.marginTop = "8px";
+	downloadDiv.style.display = "block";
+	document.getElementById("user_playlist_navigator").insertBefore(downloadDiv, document.getElementById("playnav-body"));
 }

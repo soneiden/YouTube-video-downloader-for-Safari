@@ -1,7 +1,15 @@
 1.0: Initial release.
-1.0.1: Titles added to the download links, so there would be more information on hover.
+1.0.1: Adds titles to the download links, so there would be more information on hover.
 1.0.2: Fixed for use on Vevo music video pages.
 1.0.3: Fixed UpdateManifest.plist so that updates would be detected.
 1.0.4: Slight reordering of format links. Also used to test the update mechanism (test successful).
 
 1.1: Adds basic support for YouTube's channel pages. Only the first video is download-able at the moment, but this will be improved.
+
+1.1.1:
+- Re-enables basic support for pages using the HTML5 beta (HTML5)
+- Known problem: at this time, HTML5 pages only show one download link (HTML5)
+- Adds "Standard MP4" links for all videos available in "Standard FLV" (Flash player)
+- Adds "Low quality FLV" links, which had been removed in previous versions (Flash player)
+- General code optimizations
+- Many code comments added
