@@ -14,6 +14,9 @@ Array.prototype.contains = function (variable) {
 function formatMapSorter (a, b) {
 	return formatDescriptions[a][0] - formatDescriptions[b][0];
 }
+function formatSorterHTMLFive (a, b) {
+	return formatDescriptions[a[3]][0] - formatDescriptions[b[3]][0];
+}
 // get the HTML source of the video page for later use
 var htmlSource = document.getElementsByTagName("html")[0].innerHTML;
 // determine if the page is a channel/user page
@@ -24,10 +27,12 @@ var htmlFive = false;
 if (htmlSource.search("html5-player") != -1) htmlFive = true;
 // set array of format descriptions
 var formatDescriptions = new Array();
-formatDescriptions["5"] = [6, "Low quality FLV"];
-formatDescriptions["18"] = [5, "Standard MP4"];
-formatDescriptions["34"] = [4, "Standard FLV"];
-formatDescriptions["35"] = [3, "Large FLV (480p)"];
+formatDescriptions["5"] = [8, "Low quality FLV"];
+formatDescriptions["43"] = [7, "Standard WebM"];
+formatDescriptions["18"] = [6, "Standard MP4"];
+formatDescriptions["34"] = [5, "Standard FLV"];
+formatDescriptions["35"] = [4, "Large FLV (480p)"];
+formatDescriptions["45"] = [3, "HD WebM (720p)"];
 formatDescriptions["22"] = [2, "HD MP4 (720p)"];
 formatDescriptions["37"] = [1, "Full HD MP4 (1080p)"];
 
@@ -44,15 +49,32 @@ if (!isChannel) {
 		var scripts = document.getElementsByTagName("script");
 		var scriptSource = scripts[scripts.length - 4].innerHTML;
 		// find where format function is, split into parts
-		var formatLocation = scriptSource.search('setAvailableFormat')+20;
-		var formats = scriptSource.substring(formatLocation).split('", "', 4);
-		formats[3] = formats[3].substring(0, 2);
-		// get video cache URL
-		var videoURL = formats[0];
-		// use format number to get description
-		var formatDescription = formatDescriptions[formats[3]][1];
-		// put into download string
-		var downloadString = '<a href="' + videoURL + '">' + formatDescription + '</a>';
+		var formats = scriptSource.split('videoPlayer.setAvailableFormat("');
+		// remove first piece, doesn't relate to formats
+		formats.splice(0, 1);
+		if (formats.length > 1) {
+			var downloadString = "Downloads: ";
+		} else {
+			var downloadString = "Download: ";
+		}
+		// clean up formats
+		for (var i = 0; i < formats.length; i++) {
+			formats[i] = formats[i].split('");')[0];
+			formats[i] = formats[i].split('", "');
+		}
+		// sort them
+		formats.sort(formatSorterHTMLFive);
+		// add them to the download string
+		for (var i = 0; i < formats.length; i++) {
+			var videoURL = formats[i][0];
+			if (formats[i][3] in formatDescriptions) {
+				var formatDescription = formatDescriptions[formats[i][3]][1];
+			} else {
+				var formatDescription = "Unknown format";
+			}
+			downloadString += '<a href="' + videoURL + '" title="Download as ' + formatDescription + ' by Option-clicking">' + formatDescription + '</a>, ';
+		}
+		downloadString = downloadString.substring(0, downloadString.length-2);
 	}
 	// defines the displayDownloadLinks() function
 	var downloadFunction = document.createElement("script");
@@ -103,7 +125,11 @@ if (!htmlFive) {
 	// low quality FLV could also be removed here:
 	// formatMap.splice(formatMap.indexOf("5"), 1);
 	// create a string of links to the downloads
-	var downloadString = "Downloads: ";
+	if (formatMap.length > 1) {
+		var downloadString = "Downloads: ";
+	} else {
+		var downloadString = "Download: ";
+	}
 	for (var i = 0; i < formatMap.length; i++) {
 		if (formatMap[i] in formatDescriptions) {
 			fmtDescription = formatDescriptions[formatMap[i]][1];

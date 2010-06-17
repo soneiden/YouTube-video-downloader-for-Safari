@@ -34,3 +34,7 @@
 - Sorting of formats streamlined
 - Testing for channel pages improved
 - Many code comments added
+
+1.1.2
+
+- Fixes HTML5 beta downloads for videos with more than one available format
