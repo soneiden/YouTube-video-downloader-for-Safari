@@ -1,8 +1,14 @@
 # 1.1 releases
 
+1.1.4
+
+- Videos no longer save as "videoplayback"!
+- Some cleaned up code
+- Adds a way to download Standard MP4 for some videos (Flash player)
+
 1.1.3
 
-- Fixes downloads for videos served with the Flash player (non-HTML5 beta)
+- Fixes downloads for videos served with the Flash player
 - Removes support for channel pages
 
 1.1.2
